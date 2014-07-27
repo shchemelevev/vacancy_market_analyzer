@@ -22,8 +22,16 @@ class HHSearchResultsSpider(CrawlSpider):
     def parse_vacancy_page(self, response):
         soup = BeautifulSoup(response.body_as_unicode())
         vacancy = VacancyItem()
-        vacancy['description'] = soup.find("div", {"id": "hypercontext"})
+        print vacancy
+        paid_description = soup.find("div", {"class": "hht-vacancydescription"})
+        if paid_description:
+            vacancy['description'] = paid_description
+        else:
+            vacancy['description'] = soup.find("div", {"id": "hypercontext"})
         vacancy['url'] = response.url
+        vacancy['title'] = soup.find("h1", {"class": "title b-vacancy-title"})
+        print vacancy['title']
+        vacancy.save()
         return vacancy
 
     def start_requests(self):
