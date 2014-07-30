@@ -22,16 +22,14 @@ class HHSearchResultsSpider(CrawlSpider):
     def parse_vacancy_page(self, response):
         soup = BeautifulSoup(response.body_as_unicode())
         vacancy = VacancyItem()
-        print vacancy
         paid_description = soup.find("div", {"class": "hht-vacancydescription"})
         if paid_description:
-            vacancy['description'] = paid_description
+            vacancy['description'] = unicode(paid_description)
         else:
-            vacancy['description'] = soup.find("div", {"id": "hypercontext"})
+            vacancy['description'] = unicode(soup.find("div", {"id": "hypercontext"}))
         vacancy['url'] = response.url
-        vacancy['title'] = soup.find("h1", {"class": "title b-vacancy-title"})
-        print vacancy['title']
-        vacancy.save()
+        vacancy['title'] = soup.find("h1", {"class": "title b-vacancy-title"}).contents[0]
+        vacancy.instance.save_if_unique()
         return vacancy
 
     def start_requests(self):
